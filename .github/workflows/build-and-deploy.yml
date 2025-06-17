@@ -1,0 +1,44 @@
+name: Build and Deploy to Remote
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      WEB_IMAGE_NAME: ${{ secrets.DOCKERHUB_USER }}/bagel-web:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push bagel-web Docker image
+        run: |
+          cd web
+          docker build -t $WEB_IMAGE_NAME .
+          docker push $WEB_IMAGE_NAME
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.MAC_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to GCP VM via SSH
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << ENDSSH
+          docker pull $WEB_IMAGE_NAME
+          docker stop bagel-web || true
+          docker rm bagel-web || true
+          docker run -d --name bagel-web -p 80:80 $WEB_IMAGE_NAME
+          ENDSSH 
