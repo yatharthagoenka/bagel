@@ -4,7 +4,9 @@ function App() {
   return (
     <div className="App">
       <div className="bagel-text">
-        yes it&apos;s me, b*tch
+        ~ what gender is a bagel?
+        <br/>
+        ~ dog
       </div>
     </div>
   );

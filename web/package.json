@@ -1,5 +1,5 @@
 {
-  "name": "bagel-demo",
+  "name": "bagel-web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

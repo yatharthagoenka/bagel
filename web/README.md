@@ -5,13 +5,13 @@
 Build the Docker image:
 
 ```sh
-docker build -t bagel-demo .
+docker build -t bagel-web .
 ```
 
 Run the container:
 
 ```sh
-docker run -p 80:80 bagel-demo
+docker run -p 80:80 bagel-web
 ```
 
 ## Deploying to GCP E2 Micro from GitHub
