@@ -1,0 +1,74 @@
+/* Draggable Text Box Styles */
+.draggable-text-box {
+  position: absolute;
+  font-family: 'Nunito', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) rotateY(0deg);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  cursor: move;
+  user-select: none;
+  width: auto;
+  max-width: 250px;
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.draggable-text-box:hover {
+  transform: rotateX(var(--mouse-y, 0deg)) rotateY(var(--mouse-x, 0deg)) translateZ(3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.draggable-text-box.dragging {
+  transform: rotateX(var(--mouse-y, 0deg)) rotateY(var(--mouse-x, 0deg)) translateZ(8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+  z-index: 1000;
+  border-color: rgba(255,255,255,0.3);
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+}
+
+.text-content {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.edit-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-align: center;
+  outline: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.edit-input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .draggable-text-box {
+    font-size: 1rem;
+    padding: 10px 16px;
+    min-width: 80px;
+    max-width: 200px;
+  }
+} 
