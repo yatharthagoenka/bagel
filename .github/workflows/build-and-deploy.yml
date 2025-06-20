@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WEB_IMAGE_NAME: ${{ secrets.DOCKERHUB_USER }}/bagel-web:latest
+      NGINX_IMAGE_NAME: ${{ secrets.DOCKERHUB_USER }}/nginx:latest
 
     steps:
       - name: Checkout code
@@ -29,22 +30,39 @@ jobs:
             echo "No changes in 'web' directory. Skipping web image build/push."
             exit 0
           fi
-          cd web
-          docker build -t $WEB_IMAGE_NAME .
+          docker build -t $WEB_IMAGE_NAME ./web
           docker push $WEB_IMAGE_NAME
+
+      - name: Build and push nginx Docker image
+        run: |
+          if git diff --quiet HEAD^ HEAD -- nginx; then
+            echo "No changes in 'nginx' directory. Skipping nginx image build/push."
+            exit 0
+          fi
+          docker build -t $NGINX_IMAGE_NAME ./nginx
+          docker push $NGINX_IMAGE_NAME
 
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.MAC_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.MAC_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to GCP VM via SSH
+      - name: Copy docker-compose.yml to Remote
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "
-          sudo docker pull $WEB_IMAGE_NAME && \
-          sudo docker stop bagel-web || true && \
-          sudo docker rm bagel-web || true && \
-          sudo docker run -d --name bagel-web -p 80:80 $WEB_IMAGE_NAME
-          " 
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "mkdir -p /home/${{ secrets.VM_USER }}/bagel"
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ./docker-compose.yml ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/bagel/docker-compose.yml
+
+      - name: Deploy on Remote via SSH
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "
+            export WEB_IMAGE_NAME=${{ env.WEB_IMAGE_NAME }} && \
+            export NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }} && \
+            cd ~/bagel && \
+            sudo docker-compose down && \
+            sudo docker-compose pull && \
+            sudo docker-compose up -d --remove-orphans
+          "
