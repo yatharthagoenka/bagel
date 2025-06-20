@@ -59,10 +59,12 @@ jobs:
       - name: Deploy on Remote via SSH
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "
-            export WEB_IMAGE_NAME=${{ env.WEB_IMAGE_NAME }} && \
-            export NGINX_IMAGE_NAME=${{ env.NGINX_IMAGE_NAME }} && \
+            echo 'WEB_IMAGE_NAME=${{ secrets.DOCKERHUB_USER }}/bagel-web:latest' > ~/bagel/.env && \
+            echo 'NGINX_IMAGE_NAME=${{ secrets.DOCKERHUB_USER }}/nginx:latest' >> ~/bagel/.env && \
             cd ~/bagel && \
             sudo docker-compose down && \
             sudo docker-compose pull && \
             sudo docker-compose up -d --remove-orphans
           "
+
+          
