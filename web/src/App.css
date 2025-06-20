@@ -5,6 +5,8 @@
   align-items: center;
   justify-content: center;
   background: #181A1B;
+  position: relative;
+  perspective: 1000px;
 }
 
 .App-logo {
@@ -58,6 +60,53 @@
   text-align: center;
   background: none;
   border-radius: 0;
-  padding: 0;
+  padding: 20px 40px;
   box-shadow: none;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) rotateY(0deg);
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.1s ease;
+  cursor: pointer;
+}
+
+.bagel-text:hover {
+  transform: rotateX(var(--mouse-y, 0deg)) rotateY(var(--mouse-x, 0deg)) translateZ(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Add a 3D container around the main content */
+.content-3d {
+  transform-style: preserve-3d;
+  transform: rotateX(10deg);
+  transition: transform 0.5s ease;
+}
+
+.twitter-link {
+  position: absolute;
+  bottom: 50px;
+  text-align: center;
+  width: 100%;
+  transition: transform 0.3s ease;
+}
+
+.twitter-link a {
+  color: #888;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  transition: color 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(5px);
+}
+
+.twitter-link a:hover {
+  color: #1da1f2;
+  background: rgba(29,161,242,0.1);
+  border-color: rgba(29,161,242,0.3);
 }
