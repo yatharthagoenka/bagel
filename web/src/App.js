@@ -6,6 +6,8 @@ import './App.css';
 function App() {
   const {
     textBoxes,
+    loading,
+    error,
     addTextBox,
     updateTextBoxText,
     setDragging,
@@ -20,8 +22,33 @@ function App() {
     stopAllDragging
   );
 
+  const handleAddTextBox = async (text) => {
+    await addTextBox(text);
+  };
+
+  if (loading) {
+    return (
+      <div className="App canvas">
+        <div className="loading-state">
+          <div className="loading-text">Loading pins...</div>
+        </div>
+        <div className="twitter-link">
+          <a href="https://twitter.com/whhygee" target="_blank" rel="noopener noreferrer">
+            @whhygee
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="App canvas">
+      {error && (
+        <div className="error-message">
+          Failed to load pins: {error}
+        </div>
+      )}
+      
       {textBoxes.map(box => (
         <DraggableTextBox
           key={box.id}
@@ -31,7 +58,7 @@ function App() {
         />
       ))}
       
-      <TextInput onSubmit={addTextBox} />
+      <TextInput onSubmit={handleAddTextBox} />
       
       <div className="twitter-link">
         <a href="https://twitter.com/whhygee" target="_blank" rel="noopener noreferrer">

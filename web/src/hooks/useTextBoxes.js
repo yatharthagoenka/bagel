@@ -1,35 +1,37 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { usePins } from './usePins';
 
 export const useTextBoxes = () => {
-  const [textBoxes, setTextBoxes] = useState([
-    { 
-      id: 1, 
-      text: 'brewing', 
-      x: window.innerWidth / 2 - 100, 
-      y: window.innerHeight / 2 - 40, 
-      isDragging: false 
-    }
-  ]);
+  const { pins: textBoxes, loading, error, savePin, setPins } = usePins();
 
-  const addTextBox = useCallback((text = 'brewing') => {
-    const newId = Math.max(...textBoxes.map(b => b.id)) + 1;
-    const randomX = Math.random() * (window.innerWidth - 150);
-    const randomY = Math.random() * (window.innerHeight - 150);
-    
-    setTextBoxes(prev => [...prev, {
-      id: newId,
-      text: text,
-      x: randomX,
-      y: randomY,
-      isDragging: false
-    }]);
-  }, [textBoxes]);
+  const addTextBox = useCallback(async (text = 'brewing') => {
+    try {
+      // Save to backend first
+      await savePin(text);
+      // The usePins hook will automatically reload and update the state
+    } catch (error) {
+      console.error('Failed to save pin:', error);
+      // If backend save fails, still add locally as fallback
+      const newId = Math.max(...textBoxes.map(b => b.id)) + 1;
+      const randomX = Math.random() * (window.innerWidth - 250);
+      const randomY = Math.random() * (window.innerHeight - 150);
+      
+      setPins(prev => [...prev, {
+        id: newId,
+        text: text,
+        x: randomX,
+        y: randomY,
+        isDragging: false,
+        isPersisted: false, // Mark as not saved to backend
+      }]);
+    }
+  }, [savePin, textBoxes, setPins]);
 
   const updateTextBox = useCallback((boxId, updates) => {
-    setTextBoxes(prev => prev.map(b => 
+    setPins(prev => prev.map(b => 
       b.id === boxId ? { ...b, ...updates } : b
     ));
-  }, []);
+  }, [setPins]);
 
   const updateTextBoxText = useCallback((boxId, newText) => {
     updateTextBox(boxId, { text: newText });
@@ -44,11 +46,13 @@ export const useTextBoxes = () => {
   }, [updateTextBox]);
 
   const stopAllDragging = useCallback(() => {
-    setTextBoxes(prev => prev.map(b => ({ ...b, isDragging: false })));
-  }, []);
+    setPins(prev => prev.map(b => ({ ...b, isDragging: false })));
+  }, [setPins]);
 
   return {
     textBoxes,
+    loading,
+    error,
     addTextBox,
     updateTextBoxText,
     setDragging,

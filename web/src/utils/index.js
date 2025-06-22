@@ -1,0 +1,1 @@
+export { pinAPI } from './api'; 

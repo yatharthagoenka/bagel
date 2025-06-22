@@ -52,7 +52,7 @@ export const DraggableTextBox = ({ box, onMouseDown, onUpdateText }) => {
 
   return (
     <div
-      className={`draggable-text-box ${box.isDragging ? 'dragging' : ''}`}
+      className={`draggable-text-box ${box.isDragging ? 'dragging' : ''} ${!box.isPersisted ? 'not-persisted' : ''}`}
       style={{
         left: `${box.x}px`,
         top: `${box.y}px`,
@@ -62,7 +62,11 @@ export const DraggableTextBox = ({ box, onMouseDown, onUpdateText }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={textRef}
+      title={!box.isPersisted ? "This pin is only saved locally" : ""}
     >
+      {!box.isPersisted && (
+        <div className="unsaved-indicator">!</div>
+      )}
       {isEditing ? (
         <input
           type="text"

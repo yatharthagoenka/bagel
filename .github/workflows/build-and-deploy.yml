@@ -31,7 +31,7 @@ jobs:
             echo "No changes in 'web' directory. Skipping web image build/push."
             exit 0
           fi
-          docker build -t $WEB_IMAGE_NAME ./web
+          docker build --build-arg NODE_ENV=production -t $WEB_IMAGE_NAME ./web
           docker push $WEB_IMAGE_NAME
 
       - name: Build and push bagel-app Docker image
@@ -80,4 +80,4 @@ jobs:
             sudo docker-compose up -d --remove-orphans
           "
 
-          
+        
