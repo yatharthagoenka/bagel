@@ -1,6 +1,26 @@
 # bagel
 brewing...
 
+### Frontend
+
+Totally vibe coded, AI is a bliss when you know how to use it.
+If you see trash code though, don't blame me.
+
+
+### CI/CD and Backend
+
+This is more me, still not denying that I write trash code.
+Feel free to contribute or ask anything!
+
+### Infra
+
+- GCP 
+  - Firestore
+  - Compute Engine
+
+- Domain
+  - Porkbun
+
 
 ### Setup SSL (first time only)
 
