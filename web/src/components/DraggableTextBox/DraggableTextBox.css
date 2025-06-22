@@ -18,12 +18,15 @@
   cursor: move;
   user-select: none;
   width: auto;
-  max-width: 250px;
+  max-width: 300px;
   min-width: 100px;
+  min-height: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
   position: relative;
 }
 
@@ -79,27 +82,13 @@
 }
 
 .text-content {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.edit-input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
   text-align: center;
-  outline: none;
   width: 100%;
-  padding: 0;
-  margin: 0;
-}
-
-.edit-input::placeholder {
-  color: rgba(255,255,255,0.5);
 }
 
 /* Responsive adjustments */
@@ -108,7 +97,7 @@
     font-size: 1rem;
     padding: 10px 16px;
     min-width: 80px;
-    max-width: 200px;
+    max-width: 250px;
   }
   
   .unsaved-indicator {

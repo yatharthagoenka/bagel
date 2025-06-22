@@ -20,6 +20,207 @@
   left: 0;
 }
 
+/* Info Button */
+.info-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.info-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.05);
+}
+
+/* GitHub Button */
+.github-button {
+  position: fixed;
+  top: 20px;
+  left: 70px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+  text-decoration: none;
+}
+
+.github-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.05);
+}
+
+.github-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Info Dialog */
+.info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  animation: fadeIn 0.3s ease;
+}
+
+.info-dialog {
+  background: rgba(24, 26, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideInUp 0.3s ease;
+}
+
+.info-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.info-close:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.info-dialog h3 {
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.info-item:last-child {
+  background: rgba(255, 193, 7, 0.03);
+  border-color: rgba(255, 193, 7, 0.15);
+}
+
+.info-item:last-child:hover {
+  background: rgba(255, 193, 7, 0.05);
+  border-color: rgba(255, 193, 7, 0.2);
+}
+
+.info-item strong {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.info-item:last-child strong {
+  color: rgba(255, 193, 7, 0.7);
+}
+
+.info-item span {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+.info-item:last-child span {
+  color: rgba(255, 193, 7, 0.5);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Loading State */
 .loading-state {
   display: flex;
@@ -130,4 +331,37 @@
 .twitter-link a:hover {
   color: #1da1f2;
   text-decoration-color: rgba(29, 161, 242, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .info-dialog {
+    padding: 20px;
+    margin: 20px;
+  }
+  
+  .info-dialog h3 {
+    font-size: 1.3rem;
+  }
+  
+  .info-item {
+    padding: 12px;
+  }
+  
+  .info-button {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .github-button {
+    width: 35px;
+    height: 35px;
+    left: 60px;
+  }
+
+  .github-button svg {
+    width: 16px;
+    height: 16px;
+  }
 } 

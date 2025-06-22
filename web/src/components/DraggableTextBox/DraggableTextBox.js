@@ -1,33 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import './DraggableTextBox.css';
 
-export const DraggableTextBox = ({ box, onMouseDown, onUpdateText }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(box.text);
+export const DraggableTextBox = ({ box, onMouseDown }) => {
   const textRef = useRef(null);
 
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-    setEditText(box.text);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      setIsEditing(false);
-      onUpdateText(box.id, editText);
-    } else if (e.key === 'Escape') {
-      setIsEditing(false);
-      setEditText(box.text);
-    }
-  };
-
-  const handleBlur = () => {
-    setIsEditing(false);
-    onUpdateText(box.id, editText);
-  };
-
   const handleMouseMove = (e) => {
-    if (!textRef.current || box.isDragging || isEditing) return;
+    if (!textRef.current || box.isDragging) return;
     
     const rect = textRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -57,8 +35,7 @@ export const DraggableTextBox = ({ box, onMouseDown, onUpdateText }) => {
         left: `${box.x}px`,
         top: `${box.y}px`,
       }}
-      onMouseDown={(e) => !isEditing && onMouseDown(e, box.id)}
-      onDoubleClick={handleDoubleClick}
+      onMouseDown={(e) => onMouseDown(e, box.id)}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       ref={textRef}
@@ -67,19 +44,7 @@ export const DraggableTextBox = ({ box, onMouseDown, onUpdateText }) => {
       {!box.isPersisted && (
         <div className="unsaved-indicator">!</div>
       )}
-      {isEditing ? (
-        <input
-          type="text"
-          value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          className="edit-input"
-          autoFocus
-        />
-      ) : (
-        <span className="text-content">{box.text}</span>
-      )}
+      <span className="text-content">{box.text}</span>
     </div>
   );
 }; 
