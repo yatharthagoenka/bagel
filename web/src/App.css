@@ -10,7 +10,8 @@
 }
 
 .App.canvas {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   cursor: default;
   display: block;
   width: 100vw;
@@ -18,6 +19,22 @@
   position: fixed;
   top: 0;
   left: 0;
+  /* Hide scrollbar completely */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for webkit browsers */
+.App.canvas::-webkit-scrollbar {
+  display: none;
+}
+
+/* Create a wide canvas content area */
+.canvas-content {
+  width: 100%; /* Dynamic width based on content */
+  min-width: 100vw; /* Minimum full viewport width */
+  height: 100vh;
+  position: relative;
 }
 
 /* Info Button */
@@ -258,7 +275,7 @@
 
 /* Error Message */
 .error-message {
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
@@ -287,10 +304,11 @@
 
 /* Twitter Link */
 .twitter-link {
-  position: absolute;
+  position: fixed;
   bottom: 60px; /* Text input is at 100px, so this creates 40px gap above it */
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
-  width: 100%;
   transition: transform 0.3s ease;
   z-index: 100;
   display: flex;
