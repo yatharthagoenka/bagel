@@ -11,8 +11,8 @@ export const usePins = () => {
     return backendPins.map((pin, index) => ({
       id: index + 1,
       text: pin.message,
-      x: Math.random() * (window.innerWidth - 250),
-      y: Math.random() * (window.innerHeight - 150),
+      x: Math.random() * Math.max(100, window.innerWidth - 250),
+      y: Math.random() * Math.max(100, window.innerHeight - 150),
       isDragging: false,
       isPersisted: true, // Mark as saved to backend
     }));
@@ -46,15 +46,36 @@ export const usePins = () => {
   // Save a new pin to backend
   const savePin = useCallback(async (message) => {
     try {
+      // First, add the pin locally for immediate feedback
+      const newId = Math.max(0, ...pins.map(p => p.id)) + 1;
+      const newPin = {
+        id: newId,
+        text: message,
+        x: Math.random() * Math.max(100, window.innerWidth - 250),
+        y: Math.random() * Math.max(100, window.innerHeight - 150),
+        isDragging: false,
+        isPersisted: false, // Mark as not yet saved
+      };
+      
+      // Add to local state immediately
+      setPins(prev => [...prev, newPin]);
+      
+      // Then save to backend
       await pinAPI.createPin(message);
-      // Reload pins to get the latest state
-      await loadPins();
+      
+      // Mark as persisted (don't reload all pins)
+      setPins(prev => prev.map(pin => 
+        pin.id === newId ? { ...pin, isPersisted: true } : pin
+      ));
+      
       return true;
     } catch (err) {
       setError(err.message);
+      // If backend save fails, keep the pin locally but mark as not persisted
+      console.error('Failed to save pin to backend:', err);
       throw err;
     }
-  }, [loadPins]);
+  }, [pins]);
 
   // Load pins on component mount
   useEffect(() => {

@@ -22,14 +22,19 @@ export const TextInput = ({ onSubmit }) => {
 
   return (
     <form className="text-input-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        placeholder={isSubmitting ? "saving..." : "spill whatever, really..."}
-        className={`text-input ${isSubmitting ? 'submitting' : ''}`}
-        disabled={isSubmitting}
-      />
+      <div className="text-input-container">
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder={isSubmitting ? "saving..." : "shout out into the void"}
+          className={`text-input ${isSubmitting ? 'submitting' : ''}`}
+          disabled={isSubmitting}
+        />
+        <div className="enter-arrow" title="Press Enter to submit">
+          ↵
+        </div>
+      </div>
     </form>
   );
 }; 

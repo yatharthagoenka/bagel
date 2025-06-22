@@ -87,28 +87,47 @@
 /* Twitter Link */
 .twitter-link {
   position: absolute;
-  bottom: 50px;
+  bottom: 60px; /* Text input is at 100px, so this creates 40px gap above it */
   text-align: center;
   width: 100%;
   transition: transform 0.3s ease;
   z-index: 100;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1.5;
+}
+
+.twitter-message {
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  line-height: 1.5;
+}
+
+.twitter-link:hover .twitter-message {
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .twitter-link a {
   color: #888;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(136, 136, 136, 0.3);
   font-size: 0.8rem;
   font-family: 'Nunito', 'Segoe UI', sans-serif;
-  transition: color 0.3s ease;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  line-height: 1.5;
 }
 
 .twitter-link a:hover {
   color: #1da1f2;
-  background: rgba(29,161,242,0.1);
-  border-color: rgba(29,161,242,0.3);
+  text-decoration-color: rgba(29, 161, 242, 0.6);
 } 

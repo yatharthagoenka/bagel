@@ -1,49 +1,77 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export const useDragAndDrop = (textBoxes, setDragging, updatePosition, stopAllDragging) => {
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragDataRef = useRef({
+    boxId: null,
+    startMouseX: 0,
+    startMouseY: 0,
+    startBoxX: 0,
+    startBoxY: 0
+  });
 
   const handleMouseDown = useCallback((e, boxId) => {
     e.preventDefault();
     const box = textBoxes.find(b => b.id === boxId);
     if (!box) return;
 
-    const offsetX = e.clientX - box.x;
-    const offsetY = e.clientY - box.y;
+    // Store initial drag data
+    dragDataRef.current = {
+      boxId: boxId,
+      startMouseX: e.clientX,
+      startMouseY: e.clientY,
+      startBoxX: box.x,
+      startBoxY: box.y
+    };
     
-    setDragOffset({ x: offsetX, y: offsetY });
+    setIsDragging(true);
     setDragging(boxId, true);
   }, [textBoxes, setDragging]);
 
   const handleMouseMove = useCallback((e) => {
-    const draggingBox = textBoxes.find(b => b.isDragging);
-    if (!draggingBox) return;
+    if (!isDragging || !dragDataRef.current.boxId) return;
 
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
+    const dragData = dragDataRef.current;
+    
+    // Calculate how much the mouse has moved since drag started
+    const mouseDeltaX = e.clientX - dragData.startMouseX;
+    const mouseDeltaY = e.clientY - dragData.startMouseY;
+    
+    // Calculate new box position based on initial position + mouse movement
+    const newX = dragData.startBoxX + mouseDeltaX;
+    const newY = dragData.startBoxY + mouseDeltaY;
 
-    // Constrain to viewport boundaries
-    const boxWidth = 150;
-    const boxHeight = 50;
-    const constrainedX = Math.max(0, Math.min(newX, window.innerWidth - boxWidth));
-    const constrainedY = Math.max(0, Math.min(newY, window.innerHeight - boxHeight));
-
-    updatePosition(draggingBox.id, constrainedX, constrainedY);
-  }, [textBoxes, dragOffset, updatePosition]);
+    // NO BOUNDARIES - let boxes go anywhere to test
+    updatePosition(dragData.boxId, newX, newY);
+  }, [isDragging, updatePosition]);
 
   const handleMouseUp = useCallback(() => {
-    stopAllDragging();
-  }, [stopAllDragging]);
+    if (isDragging) {
+      setIsDragging(false);
+      stopAllDragging();
+      
+      // Clear drag data
+      dragDataRef.current = {
+        boxId: null,
+        startMouseX: 0,
+        startMouseY: 0,
+        startBoxX: 0,
+        startBoxY: 0
+      };
+    }
+  }, [isDragging, stopAllDragging]);
 
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [handleMouseMove, handleMouseUp]);
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return {
     handleMouseDown

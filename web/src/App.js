@@ -32,7 +32,8 @@ function App() {
         <div className="loading-state">
           <div className="loading-text">Loading pins...</div>
         </div>
-        <div className="twitter-link">
+        <div className="twitter-link"> 
+          <span className="twitter-message">If it's something private, I'm available at</span>
           <a href="https://twitter.com/whhygee" target="_blank" rel="noopener noreferrer">
             @whhygee
           </a>
@@ -61,6 +62,7 @@ function App() {
       <TextInput onSubmit={handleAddTextBox} />
       
       <div className="twitter-link">
+        <span className="twitter-message">If it's something private, I'm available at</span>
         <a href="https://twitter.com/whhygee" target="_blank" rel="noopener noreferrer">
           @whhygee
         </a>
