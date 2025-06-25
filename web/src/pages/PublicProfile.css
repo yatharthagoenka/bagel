@@ -1,0 +1,131 @@
+.public-profile-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+.public-profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.public-profile-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-align: center;
+}
+
+.back-button {
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.home-button {
+  width: 48px;
+  height: 48px;
+  margin: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.home-icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.username-section {
+  margin-bottom: 2rem;
+  text-align: center;
+  padding-top: 4rem;
+}
+
+.username-section h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .public-profile-container {
+    padding: 1rem;
+  }
+
+  .public-profile-header h1 {
+    font-size: 2rem;
+  }
+
+  .home-button {
+    width: 40px;
+    height: 40px;
+    margin: 0.75em;
+  }
+
+  .home-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .username-section h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-profile-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .back-button {
+    padding: 0.375rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .home-button {
+    width: 36px;
+    height: 36px;
+    margin: 0.5em;
+  }
+
+  .home-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .username-section h1 {
+    font-size: 1.5rem;
+  }
+} 

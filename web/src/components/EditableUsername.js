@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './EditableUsername.css';
+import { updateUserProfile } from '../services/api';
 
 const EditableUsername = ({ username, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -28,8 +29,9 @@ const EditableUsername = ({ username, onUpdate }) => {
     setError('');
 
     try {
-      await onUpdate(tempUsername.trim());
+      await updateUserProfile({ username: tempUsername.trim() });
       setIsEditing(false);
+      onUpdate(tempUsername.trim());
     } catch (error) {
       setError(error.message);
     } finally {
