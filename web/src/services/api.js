@@ -3,6 +3,13 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    // If response is not JSON, get the text and include it in the error
+    const text = await response.text();
+    throw new Error(`Non-JSON response (${response.status}): ${text.substring(0, 100)}...`);
+  }
+
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.error || `HTTP error! status: ${response.status}`);
