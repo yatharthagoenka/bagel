@@ -28,40 +28,33 @@ type HandlerResponse struct {
 	Status int         `json:"-"`
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var response HandlerResponse
+func (h *Handler) WrapHandler(handler func(*http.Request) HandlerResponse) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		response := handler(r)
 
-	switch {
-	case strings.HasPrefix(r.URL.Path, "/user"):
-		response = h.handleUser(r)
-	case r.URL.Path == "/init":
-		response = h.handleInit(r)
-	default:
-		response = HandlerResponse{
-			Error:  "not found",
-			Status: http.StatusNotFound,
+		w.Header().Set("Content-Type", "application/json")
+		if response.Status == 0 {
+			response.Status = http.StatusOK
 		}
+		w.WriteHeader(response.Status)
+		json.NewEncoder(w).Encode(response)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if response.Status == 0 {
-		response.Status = http.StatusOK
-	}
-	w.WriteHeader(response.Status)
-	json.NewEncoder(w).Encode(response)
 }
 
-func (h *Handler) handleUser(r *http.Request) HandlerResponse {
+func (h *Handler) HandleUserPublicData(r *http.Request) HandlerResponse {
+	if r.Method != http.MethodGet {
+		return HandlerResponse{
+			Error:  "method not allowed",
+			Status: http.StatusMethodNotAllowed,
+		}
+	}
+	return h.getUserPublicData(r, r.URL.Query().Get("username"))
+}
+
+func (h *Handler) HandleUser(r *http.Request) HandlerResponse {
 	switch r.Method {
 	case http.MethodGet:
-		username := strings.TrimPrefix(r.URL.Path, "/user/")
-		if username == "" {
-			return HandlerResponse{
-				Error:  "username is required",
-				Status: http.StatusBadRequest,
-			}
-		}
-		return h.getUser(r, username)
+		return h.withAuth(r, h.getUser)
 	case http.MethodPut:
 		return h.withAuth(r, h.updateUser)
 	default:
@@ -72,8 +65,24 @@ func (h *Handler) handleUser(r *http.Request) HandlerResponse {
 	}
 }
 
-func (h *Handler) getUser(r *http.Request, username string) HandlerResponse {
-	user, err := h.userSvc.GetUserLinks(r.Context(), username)
+func (h *Handler) HandleInit(r *http.Request) HandlerResponse {
+	if r.Method != http.MethodPost {
+		return HandlerResponse{
+			Error:  "method not allowed",
+			Status: http.StatusMethodNotAllowed,
+		}
+	}
+	return h.withAuth(r, h.initUser)
+}
+
+func (h *Handler) getUserPublicData(r *http.Request, username string) HandlerResponse {
+	if username == "" {
+		return HandlerResponse{
+			Error:  "username is required",
+			Status: http.StatusBadRequest,
+		}
+	}
+	u, err := h.userSvc.GetUserPublicData(r.Context(), username)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			return HandlerResponse{
@@ -87,7 +96,29 @@ func (h *Handler) getUser(r *http.Request, username string) HandlerResponse {
 		}
 	}
 	return HandlerResponse{
-		Data: api.GetUserLinksResponse{User: user},
+		Data: api.GetUserPublicDataResponse{
+			Username: u.Username,
+			Links:    u.Links,
+		},
+	}
+}
+
+func (h *Handler) getUser(r *http.Request, userID string) HandlerResponse {
+	u, err := h.userSvc.GetUserMetadata(r.Context(), userID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return HandlerResponse{
+				Error:  "user not found",
+				Status: http.StatusNotFound,
+			}
+		}
+		return HandlerResponse{
+			Error:  err.Error(),
+			Status: http.StatusInternalServerError,
+		}
+	}
+	return HandlerResponse{
+		Data: api.GetUserResponse{User: u},
 	}
 }
 
@@ -118,7 +149,7 @@ func (h *Handler) updateUser(r *http.Request, userID string) HandlerResponse {
 		}
 	}
 
-	u, err := h.userSvc.GetUserByID(r.Context(), userID)
+	u, err := h.userSvc.GetUserMetadata(r.Context(), userID)
 	if err != nil {
 		return HandlerResponse{
 			Error:  err.Error(),
@@ -128,18 +159,6 @@ func (h *Handler) updateUser(r *http.Request, userID string) HandlerResponse {
 
 	return HandlerResponse{
 		Data: api.UpdateUserResponse{User: u},
-	}
-}
-
-func (h *Handler) handleInit(r *http.Request) HandlerResponse {
-	switch r.Method {
-	case http.MethodPost:
-		return h.withAuth(r, h.initUser)
-	default:
-		return HandlerResponse{
-			Error:  "method not allowed",
-			Status: http.StatusMethodNotAllowed,
-		}
 	}
 }
 
@@ -159,7 +178,7 @@ func (h *Handler) initUser(r *http.Request, userID string) HandlerResponse {
 		}
 	}
 
-	u, err := h.userSvc.GetUserByID(r.Context(), userID)
+	u, err := h.userSvc.GetUserMetadata(r.Context(), userID)
 	if err != nil {
 		return HandlerResponse{
 			Error:  err.Error(),
