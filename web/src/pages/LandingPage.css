@@ -11,7 +11,55 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 800px;
+  width: 100%;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #FF9966, #FF5E62);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+}
+
+.hero-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.feature-tag {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.feature-tag:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .header {
@@ -45,33 +93,30 @@
 }
 
 .search-container {
-  position: relative;
+  margin-bottom: 1rem;
 }
 
 .search-input {
   width: 400px;
-  padding: 20px 25px;
-  font-size: 18px;
-  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  padding: 1rem 1.5rem;
+  font-size: 1.125rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.9);
-  outline: none;
   transition: all 0.3s ease;
+  outline: none;
   backdrop-filter: blur(10px);
-  text-align: center;
+}
+
+.search-input:focus {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
 
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
-  text-align: center;
-}
-
-.search-input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
 
 .search-input:disabled {
@@ -108,9 +153,10 @@
 }
 
 .divider {
-  margin: 30px 0;
   position: relative;
-  color: #999;
+  width: 300px;
+  text-align: center;
+  margin: 1rem 0;
 }
 
 .divider::before {
@@ -120,14 +166,25 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .divider span {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0 20px;
   position: relative;
-  z-index: 1;
+  background: #181A1B;
+  padding: 0 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  text-transform: lowercase;
+  letter-spacing: 0.5px;
+}
+
+.create-text {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
 }
 
 .auth-section {
@@ -210,8 +267,9 @@
 
 .login-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 0.5rem;
 }
 
 /* Google login button styles */
@@ -302,4 +360,69 @@
     font-size: 13px;
     min-width: 160px;
   }
+}
+
+/* Animation keyframes */
+@keyframes moveUp {
+  0% {
+    transform: translateY(40vh);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes titleScale {
+  0% {
+    transform: translateY(40vh) scale(1.5);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animation classes */
+.animate-title {
+  animation: titleScale 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-up {
+  animation: moveUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Delay classes for fade-in elements */
+.hero-subtitle {
+  animation-delay: 0.2s;
+}
+
+.hero-features {
+  animation-delay: 0.3s;
+}
+
+.search-container {
+  animation-delay: 0.4s;
+}
+
+.divider {
+  animation-delay: 0.45s;
+}
+
+.login-container {
+  animation-delay: 0.5s;
 } 

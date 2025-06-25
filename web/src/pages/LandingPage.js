@@ -48,10 +48,21 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <div className="landing-container">
-        <div className="search-container">
+        <div className="hero-section animate-up">
+          <h1 className="hero-title animate-title">bagel</h1>
+          <p className="hero-subtitle animate-fade-in">Your free link-tree alternative.</p>
+          <div className="hero-features animate-fade-in">
+            <span className="feature-tag">✨ No Ads</span>
+            <span className="feature-tag">🔗 Unlimited Links</span>
+            <span className="feature-tag">🖊️ Custom Profile</span>
+            <span className="feature-tag">💯 Forever Free</span>
+          </div>
+        </div>
+
+        <div className="search-container animate-fade-in">
           <input
             type="text"
-            placeholder="Enter username to search..."
+            placeholder="Search by username" style={{textAlign: 'center'}}
             value={searchUsername}
             onChange={(e) => setSearchUsername(e.target.value)}
             onKeyDown={handleKeyPress}
@@ -61,7 +72,12 @@ const LandingPage = () => {
           />
         </div>
 
-        <div className="login-container">
+        <div className="divider animate-fade-in">
+          <span>or</span>
+        </div>
+
+        <div className="login-container animate-fade-in">
+          <p className="create-text">Create your own</p>
           {isAuthenticated ? (
             <button 
               onClick={() => navigate('/profile')}
