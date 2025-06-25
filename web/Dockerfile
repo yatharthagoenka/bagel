@@ -3,7 +3,9 @@ WORKDIR /app
 
 # Accept NODE_ENV as build argument, default to production
 ARG NODE_ENV=production
+ARG REACT_APP_GOOGLE_CLIENT_ID=
 ENV NODE_ENV=${NODE_ENV}
+ENV REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID}
 
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
