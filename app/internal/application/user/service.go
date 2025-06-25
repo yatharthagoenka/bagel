@@ -1,4 +1,4 @@
-package pinboard
+package user
 
 import "app/internal/domain/firestore"
 
@@ -6,8 +6,8 @@ type Service struct {
 	firestoreSvc *firestore.Service
 }
 
-func NewService(d *firestore.Service) *Service {
+func NewService(f *firestore.Service) *Service {
 	return &Service{
-		firestoreSvc: d,
+		firestoreSvc: f,
 	}
 }

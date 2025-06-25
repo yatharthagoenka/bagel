@@ -7,9 +7,10 @@ import (
 
 	"cloud.google.com/go/firestore"
 
-	applicationpinboard "app/internal/application/pinboard"
+	applicationuser "app/internal/application/user"
 	domainfirestore "app/internal/domain/firestore"
 	"app/internal/handler"
+	"app/internal/pkg/auth"
 	"app/internal/pkg/config"
 )
 
@@ -19,24 +20,30 @@ type Server struct {
 }
 
 func NewServer(ctx context.Context, app *config.App) (*Server, error) {
+	// Initialize Firestore client
 	firestoreClient, err := firestore.NewClient(ctx, app.GCPProjectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create firestore client: %w", err)
 	}
 
-	fs := domainfirestore.NewService(firestoreClient, app.FirestoreConfig.PinboardCollection)
-	ps := applicationpinboard.NewService(fs)
+	// Initialize services (using users collection for the user service)
+	fs := domainfirestore.NewService(firestoreClient, app.FirestoreConfig.UserCollection)
+	us := applicationuser.NewService(fs)
 
-	h := handler.NewHandler(ps)
-	handler := http.StripPrefix("/api", h)
+	// Initialize Google OAuth middleware
+	authMiddleware := auth.NewAuthMiddleware()
 
-	http := &http.Server{
+	// Initialize handler
+	h := handler.NewHandler(us, authMiddleware)
+	handlerWithPrefix := http.StripPrefix("/api", h)
+
+	httpServer := &http.Server{
 		Addr:    app.Port,
-		Handler: handler,
+		Handler: handlerWithPrefix,
 	}
 
 	return &Server{
-		http:            http,
+		http:            httpServer,
 		firestoreClient: firestoreClient,
 	}, nil
 }

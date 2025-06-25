@@ -8,7 +8,7 @@ import (
 )
 
 type FirestoreConfig struct {
-	PinboardCollection string `envconfig:"BAGEL_FS_PINBOARD_COLLECTION" required:"true"`
+	UserCollection string `envconfig:"BAGEL_FS_USER_COLLECTION" required:"true"`
 }
 
 type App struct {
