@@ -74,7 +74,7 @@ jobs:
             echo 'APP_IMAGE_NAME=${{ secrets.DOCKERHUB_USER }}/bagel-app:latest' >> ~/bagel/.env && \
             echo 'NGINX_IMAGE_NAME=${{ secrets.DOCKERHUB_USER }}/nginx:latest' >> ~/bagel/.env && \
             echo 'GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}' >> ~/bagel/.env && \
-            echo 'PINBOARD_COLLECTION=${{ secrets.PINBOARD_COLLECTION }}' >> ~/bagel/.env && \
+            echo 'USER_COLLECTION=${{ secrets.USER_COLLECTION }}' >> ~/bagel/.env && \
             cd ~/bagel && \
             sudo docker-compose down && \
             sudo docker-compose pull && \

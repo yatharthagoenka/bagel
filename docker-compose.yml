@@ -19,7 +19,7 @@ services:
     environment:
       - BAGEL_APP_PORT=4000
       - BAGEL_GCP_PROJECT_ID=${GCP_PROJECT_ID}
-      - BAGEL_FS_PINBOARD_COLLECTION=${PINBOARD_COLLECTION}
+      - BAGEL_FS_USER_COLLECTION=${USER_COLLECTION}
     restart: always
     depends_on:
       - web

@@ -1,27 +1,27 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
+	"strings"
 
-	"app/internal/application/pinboard"
-	"app/internal/domain/firestore"
+	"app/internal/application/user"
 	"app/internal/handler/api"
+	"app/internal/pkg/auth"
 )
 
 type Handler struct {
-	pinboardSvc *pinboard.Service
+	userSvc        *user.Service
+	authMiddleware *auth.AuthMiddleware
 }
 
-func NewHandler(p *pinboard.Service) *Handler {
+func NewHandler(u *user.Service, authMiddleware *auth.AuthMiddleware) *Handler {
 	return &Handler{
-		pinboardSvc: p,
+		userSvc:        u,
+		authMiddleware: authMiddleware,
 	}
 }
 
-// HandlerResponse represents a unified response structure
 type HandlerResponse struct {
 	Data   interface{} `json:"data,omitempty"`
 	Error  string      `json:"error,omitempty"`
@@ -31,9 +31,11 @@ type HandlerResponse struct {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var response HandlerResponse
 
-	switch r.URL.Path {
-	case "/pin":
-		response = h.handlePin(r)
+	switch {
+	case strings.HasPrefix(r.URL.Path, "/user"):
+		response = h.handleUser(r)
+	case r.URL.Path == "/init":
+		response = h.handleInit(r)
 	default:
 		response = HandlerResponse{
 			Error:  "not found",
@@ -49,37 +51,19 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (h *Handler) handlePin(r *http.Request) HandlerResponse {
+func (h *Handler) handleUser(r *http.Request) HandlerResponse {
 	switch r.Method {
-	case http.MethodPost:
-		var req api.CreatePinRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	case http.MethodGet:
+		username := strings.TrimPrefix(r.URL.Path, "/user/")
+		if username == "" {
 			return HandlerResponse{
-				Error:  "invalid JSON body",
+				Error:  "username is required",
 				Status: http.StatusBadRequest,
 			}
 		}
-
-		if err := h.createPin(r.Context(), req); err != nil {
-			return HandlerResponse{
-				Error:  err.Error(),
-				Status: http.StatusInternalServerError,
-			}
-		}
-		return HandlerResponse{
-			Status: http.StatusCreated,
-		}
-	case http.MethodGet:
-		pins, err := h.getAllPins(r.Context())
-		if err != nil {
-			return HandlerResponse{
-				Error:  err.Error(),
-				Status: http.StatusInternalServerError,
-			}
-		}
-		return HandlerResponse{
-			Data: api.GetAllPinsResponse{Pins: pins},
-		}
+		return h.getUser(r, username)
+	case http.MethodPut:
+		return h.withAuth(r, h.updateUser)
 	default:
 		return HandlerResponse{
 			Error:  "method not allowed",
@@ -88,24 +72,133 @@ func (h *Handler) handlePin(r *http.Request) HandlerResponse {
 	}
 }
 
-func (h *Handler) createPin(ctx context.Context, req api.CreatePinRequest) error {
-	if req.Message == "" {
-		return errors.New("message is required")
-	}
-
-	if err := h.pinboardSvc.AddPin(ctx, &firestore.PinboardRecord{
-		Message: req.Message,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (h *Handler) getAllPins(ctx context.Context) ([]*firestore.PinboardRecord, error) {
-	pins, err := h.pinboardSvc.GetAllPins(ctx)
+func (h *Handler) getUser(r *http.Request, username string) HandlerResponse {
+	user, err := h.userSvc.GetUserLinks(r.Context(), username)
 	if err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), "not found") {
+			return HandlerResponse{
+				Error:  "user not found",
+				Status: http.StatusNotFound,
+			}
+		}
+		return HandlerResponse{
+			Error:  err.Error(),
+			Status: http.StatusInternalServerError,
+		}
 	}
-	return pins, nil
+	return HandlerResponse{
+		Data: api.GetUserLinksResponse{User: user},
+	}
 }
+
+func (h *Handler) updateUser(r *http.Request, userID string) HandlerResponse {
+	var req api.UpdateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return HandlerResponse{
+			Error:  "invalid JSON body",
+			Status: http.StatusBadRequest,
+		}
+	}
+
+	if req.Username != nil {
+		if err := h.userSvc.UpdateUsername(r.Context(), userID, *req.Username); err != nil {
+			return HandlerResponse{
+				Error:  err.Error(),
+				Status: http.StatusInternalServerError,
+			}
+		}
+	}
+
+	if req.Links != nil {
+		if err := h.userSvc.UpdateUserLinks(r.Context(), userID, *req.Links); err != nil {
+			return HandlerResponse{
+				Error:  err.Error(),
+				Status: http.StatusInternalServerError,
+			}
+		}
+	}
+
+	u, err := h.userSvc.GetUserByID(r.Context(), userID)
+	if err != nil {
+		return HandlerResponse{
+			Error:  err.Error(),
+			Status: http.StatusInternalServerError,
+		}
+	}
+
+	return HandlerResponse{
+		Data: api.UpdateUserResponse{User: u},
+	}
+}
+
+func (h *Handler) handleInit(r *http.Request) HandlerResponse {
+	switch r.Method {
+	case http.MethodPost:
+		return h.withAuth(r, h.initUser)
+	default:
+		return HandlerResponse{
+			Error:  "method not allowed",
+			Status: http.StatusMethodNotAllowed,
+		}
+	}
+}
+
+func (h *Handler) initUser(r *http.Request, userID string) HandlerResponse {
+	var req api.InitUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return HandlerResponse{
+			Error:  "invalid JSON body",
+			Status: http.StatusBadRequest,
+		}
+	}
+
+	if err := h.userSvc.CreateUserFromAuth(r.Context(), userID, req.Email, req.Name); err != nil {
+		return HandlerResponse{
+			Error:  err.Error(),
+			Status: http.StatusInternalServerError,
+		}
+	}
+
+	u, err := h.userSvc.GetUserByID(r.Context(), userID)
+	if err != nil {
+		return HandlerResponse{
+			Error:  err.Error(),
+			Status: http.StatusInternalServerError,
+		}
+	}
+
+	return HandlerResponse{
+		Data: api.InitUserResponse{User: u},
+	}
+}
+
+func (h *Handler) withAuth(r *http.Request, handler func(*http.Request, string) HandlerResponse) HandlerResponse {
+	userID, ok := h.extractAuthenticatedUser(r)
+	if !ok {
+		return HandlerResponse{
+			Error:  "unauthorized",
+			Status: http.StatusUnauthorized,
+		}
+	}
+	return handler(r, userID)
+}
+
+func (h *Handler) extractAuthenticatedUser(r *http.Request) (string, bool) {
+	var userID string
+	var authenticated bool
+
+	h.authMiddleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if id, ok := auth.GetUserIDFromContext(r.Context()); ok {
+			userID = id
+			authenticated = true
+		}
+	})).ServeHTTP(&discardResponseWriter{}, r)
+
+	return userID, authenticated
+}
+
+type discardResponseWriter struct{}
+
+func (d *discardResponseWriter) Header() http.Header        { return make(http.Header) }
+func (d *discardResponseWriter) Write([]byte) (int, error)  { return 0, nil }
+func (d *discardResponseWriter) WriteHeader(statusCode int) {}
