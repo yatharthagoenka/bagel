@@ -2,8 +2,14 @@ package api
 
 import "app/internal/domain/firestore"
 
-// GetUserLinksResponse represents the response body for getting a user's links
-type GetUserLinksResponse struct {
+// GetUserPublicDataResponse represents the response body for getting a user's public data
+type GetUserPublicDataResponse struct {
+	Username string           `json:"username"`
+	Links    []firestore.Link `json:"links"`
+}
+
+// GetUserResponse represents the response body for getting a user's metadata
+type GetUserResponse struct {
 	User *firestore.User `json:"user"`
 }
 

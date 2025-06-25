@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"cloud.google.com/go/firestore"
 
@@ -15,36 +16,51 @@ import (
 )
 
 type Server struct {
-	http            *http.Server
-	firestoreClient *firestore.Client
+	http    *http.Server
+	closeFn func()
 }
 
+const (
+	apiPrefix = "/api"
+)
+
 func NewServer(ctx context.Context, app *config.App) (*Server, error) {
-	// Initialize Firestore client
-	firestoreClient, err := firestore.NewClient(ctx, app.GCPProjectID)
+	var closeFns []func() error
+	closeFn := func() {
+		slices.Reverse(closeFns)
+		for _, fn := range closeFns {
+			if err := fn(); err != nil {
+				fmt.Printf("error closing: %v\n", err)
+			}
+		}
+	}
+
+	fc, err := firestore.NewClient(ctx, app.GCPProjectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create firestore client: %w", err)
 	}
+	closeFns = append(closeFns, fc.Close)
 
-	// Initialize services (using users collection for the user service)
-	fs := domainfirestore.NewService(firestoreClient, app.FirestoreConfig.UserCollection)
+	fs := domainfirestore.NewService(fc, app.FirestoreConfig.UserCollection)
 	us := applicationuser.NewService(fs)
 
-	// Initialize Google OAuth middleware
 	authMiddleware := auth.NewAuthMiddleware()
 
-	// Initialize handler
 	h := handler.NewHandler(us, authMiddleware)
-	handlerWithPrefix := http.StripPrefix("/api", h)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc(apiPrefix+"/user/init", h.WrapHandler(h.HandleInit))
+	mux.HandleFunc(apiPrefix+"/user/p", h.WrapHandler(h.HandleUserPublicData))
+	mux.HandleFunc(apiPrefix+"/user", h.WrapHandler(h.HandleUser))
 
 	httpServer := &http.Server{
 		Addr:    app.Port,
-		Handler: handlerWithPrefix,
+		Handler: mux,
 	}
 
 	return &Server{
-		http:            httpServer,
-		firestoreClient: firestoreClient,
+		http:    httpServer,
+		closeFn: closeFn,
 	}, nil
 }
 
@@ -54,6 +70,7 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	defer s.firestoreClient.Close()
-	return s.http.Shutdown(ctx)
+	err := s.http.Shutdown(ctx)
+	s.closeFn()
+	return err
 }
