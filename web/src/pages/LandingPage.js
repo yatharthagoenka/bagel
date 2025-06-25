@@ -62,7 +62,8 @@ const LandingPage = () => {
         <div className="search-container animate-fade-in">
           <input
             type="text"
-            placeholder="Search by username" style={{textAlign: 'center'}}
+            placeholder="Search by username" 
+            style={{textAlign: 'center'}}
             value={searchUsername}
             onChange={(e) => setSearchUsername(e.target.value)}
             onKeyDown={handleKeyPress}
