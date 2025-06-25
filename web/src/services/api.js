@@ -1,4 +1,5 @@
-const API_BASE_URL = '/api';
+// Get the API base URL from environment variables with fallback
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
