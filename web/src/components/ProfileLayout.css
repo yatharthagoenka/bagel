@@ -1,0 +1,199 @@
+.profile,
+.public-profile {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.links-container {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.back-button {
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.back-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+}
+
+/* Error state */
+.error {
+  text-align: center;
+  color: #ff6b6b;
+  padding: 2rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 400px;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+}
+
+/* Empty state */
+.no-links {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin: 2rem 0;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.no-links:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Add link button */
+.add-link-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #666;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.add-link-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+/* Username styles */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #212529;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .profile,
+  .public-profile {
+    padding: 1rem;
+  }
+
+  .links-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+  width: 100%;
+  justify-items: center;
+  align-items: start;
+}
+
+.links-grid.centered {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .links-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .links-grid.centered {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-layout {
+    padding: 1rem;
+  }
+
+  .links-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .links-grid.centered {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 1rem;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.error-message {
+  text-align: center;
+  color: #ff6b6b;
+  padding: 1rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.cmd-click-hint {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .cmd-click-hint {
+    font-size: 0.75rem;
+    bottom: 1rem;
+  }
+} 

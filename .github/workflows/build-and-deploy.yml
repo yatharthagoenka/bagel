@@ -13,6 +13,7 @@ jobs:
       APP_IMAGE_NAME: ${{ secrets.DOCKERHUB_USER }}/bagel-app:latest
       NGINX_IMAGE_NAME: ${{ secrets.DOCKERHUB_USER }}/nginx:latest
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      API_BASE_URL: bagel.ac/api
 
     steps:
       - name: Checkout code
@@ -32,7 +33,11 @@ jobs:
             echo "No changes in 'web' directory. Skipping web image build/push."
             exit 0
           fi
-          docker build --build-arg NODE_ENV=production --build-arg REACT_APP_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID -t $WEB_IMAGE_NAME ./web
+          docker build \
+            --build-arg NODE_ENV=production \
+            --build-arg REACT_APP_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+            --build-arg REACT_APP_API_BASE_URL=$API_BASE_URL \
+            -t $WEB_IMAGE_NAME ./web
           docker push $WEB_IMAGE_NAME
 
       - name: Build and push bagel-app Docker image

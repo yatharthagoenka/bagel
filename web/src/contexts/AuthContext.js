@@ -21,57 +21,29 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('user_data');
     
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      try {
+        setToken(storedToken);
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        console.log('Restored user data:', parsedUser); // Debug log
+      } catch (error) {
+        console.error('Failed to parse stored user data:', error);
+        localStorage.removeItem('google_token');
+        localStorage.removeItem('user_data');
+      }
     }
     
     setLoading(false);
   }, []);
 
-  const login = async (googleToken) => {
-    try {
-      // Verify token with Google and get user info
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          'Authorization': `Bearer ${googleToken}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get user info from Google');
-      }
-
-      const googleUser = await response.json();
-      
-      // Store token and user data
-      localStorage.setItem('google_token', googleToken);
-      localStorage.setItem('user_data', JSON.stringify(googleUser));
-      
-      setToken(googleToken);
-      setUser(googleUser);
-
-      // Initialize user in our backend
-      const initResponse = await fetch('/api/init', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${googleToken}`
-        },
-        body: JSON.stringify({
-          email: googleUser.email,
-          name: googleUser.name
-        })
-      });
-
-      if (!initResponse.ok) {
-        console.warn('Failed to initialize user in backend');
-      }
-
-      return googleUser;
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
+  const login = async (googleToken, userData) => {
+    console.log('Logging in with user data:', userData); // Debug log
+    // Store token and user data
+    localStorage.setItem('google_token', googleToken);
+    localStorage.setItem('user_data', JSON.stringify(userData));
+    
+    setToken(googleToken);
+    setUser(userData);
   };
 
   const logout = () => {
@@ -111,6 +83,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     apiRequest,
+    setUser,
+    setToken,
     isAuthenticated: !!user && !!token
   };
 
